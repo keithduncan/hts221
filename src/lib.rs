@@ -60,6 +60,11 @@ impl<Comm, E> HTS221<Comm, E>
 where
     Comm: Write<Error = E> + WriteRead<Error = E>,
 {
+    /// Consume the sensor and return the underlying i2c peripheral.
+    pub fn free(self) -> Comm {
+        self.comm
+    }
+    
     /// Returns the current humidity reading, in relative humidity half-percentage points.  To get
     /// the relative humidity as a percentage between 0 and 100, divide the result by 2.
     pub fn humidity_x2(&mut self) -> Result<u16, E> {
@@ -219,7 +224,7 @@ where
         }
     }
 
-    /// Consume the sensor and return the underlying i2c peripheral.
+    /// Consume the builder and return the underlying i2c peripheral.
     pub fn free(self) -> Comm {
         self.comm
     }
