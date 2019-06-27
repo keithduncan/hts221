@@ -219,6 +219,11 @@ where
         }
     }
 
+    /// Consume the sensor and return the underlying i2c peripheral.
+    pub fn free(self) -> Comm {
+        self.comm
+    }
+
     /// Configures the number of internal temperature samples that will be averaged into one output
     /// sample.
     pub fn with_avg_t(mut self, avg_t: AvgT) -> Self {
