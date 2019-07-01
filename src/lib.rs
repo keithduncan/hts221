@@ -64,6 +64,21 @@ where
     pub fn free(self) -> Comm {
         self.comm
     }
+
+    pub fn set_one_shot(&mut self) -> Result<(), E> {
+        self
+            .cr2()
+            .and_then(|mut cr2| {
+                cr2.modify(&mut self.comm, |cr2| {
+                    cr2.set_one_shot()
+                })
+            })
+            .map(|_| ())
+    }
+
+    pub fn is_one_shot(&mut self) -> Result<bool, E> {
+        self.cr2().map(|cr2| cr2.is_one_shot())
+    }
     
     /// Returns the current humidity reading, in relative humidity half-percentage points.  To get
     /// the relative humidity as a percentage between 0 and 100, divide the result by 2.
