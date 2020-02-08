@@ -81,24 +81,18 @@ impl<Comm, E> HTS221<Comm, E>
 where
     Comm: Write<Error = E> + WriteRead<Error = E>,
 {
-    /// Consume the sensor and return the underlying i2c peripheral.
-    pub fn free(self) -> Comm {
-        self.comm
+    pub fn set_one_shot(&mut self, comm: &mut Comm) -> Result<(), E> {
+        let mut cr2 = self.cr2(comm)?;
+        
+        cr2.modify(comm, |cr2| {
+            cr2.set_one_shot()
+        })?;
+
+        Ok(())
     }
 
-    pub fn set_one_shot(&mut self) -> Result<(), E> {
-        self
-            .cr2()
-            .and_then(|mut cr2| {
-                cr2.modify(&mut self.comm, |cr2| {
-                    cr2.set_one_shot()
-                })
-            })
-            .map(|_| ())
-    }
-
-    pub fn is_one_shot(&mut self) -> Result<bool, E> {
-        self.cr2().map(|cr2| cr2.is_one_shot())
+    pub fn is_one_shot(&mut self, comm: &mut Comm) -> Result<bool, E> {
+        self.cr2(comm).map(|cr2| cr2.is_one_shot())
     }
     
     /// Returns the current humidity reading, in relative humidity half-percentage points.  To get
@@ -257,11 +251,6 @@ where
             _c: PhantomData,
             _e: PhantomData,
         }
-    }
-
-    /// Consume the builder and return the underlying i2c peripheral.
-    pub fn free(self) -> Comm {
-        self.comm
     }
 
     /// Configures the number of internal temperature samples that will be averaged into one output
